@@ -1,0 +1,65 @@
+---
+title: "Untitled"
+author: "Andrew M. Dolman"
+date: "7 April 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(luftr)
+```
+
+```{r}
+
+
+home.data.long.5mins <- home.data.long %>% 
+  mutate(Time = as.POSIXct(round(as.double(Time)/(5*60))*(5*60),
+                                  origin=(as.POSIXct('1970-01-01')))) %>% 
+  group_by(Time, Variable) %>% 
+  mutate(Value = mean(Value, na.rm = T))
+
+home.data.long.day <- home.data.long %>% 
+  mutate(Time = as.Date(Time)) %>% 
+  group_by(Time, Variable) %>% 
+  mutate(Value = mean(Value, na.rm = T))
+```
+
+
+```{r}
+p <- home.data.long %>% 
+  filter(Variable %in% c("Time", "SDS_P1", "SDS_P2", "Temp", "Humidity")) %>% 
+  ggplot(aes(x = Time, y = Value)) +
+  geom_line() +
+  expand_limits(y = 0) +
+  facet_wrap(~Variable, scales = "free_y")
+p  
+```
+
+```{r}
+p <- home.data.long.5mins %>% 
+  filter(Variable %in% c("Time", "SDS_P1", "SDS_P2", "Temp", "Humidity")) %>% 
+  ggplot(aes(x = Time, y = Value)) +
+  geom_line() +
+  expand_limits(y = 0) +
+  facet_wrap(~Variable, scales = "free_y")
+p 
+```
+
+
+```{r}
+p <- home.data.long.day %>% 
+  filter(Variable %in% c("Time", "SDS_P1", "SDS_P2", "Temp", "Humidity")) %>% 
+  ggplot(aes(x = Time, y = Value)) +
+  geom_line() +
+  expand_limits(y = 0) +
+  facet_wrap(~Variable, scales = "free_y")
+p 
+```
+
+
