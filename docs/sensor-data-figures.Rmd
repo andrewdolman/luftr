@@ -18,15 +18,15 @@ library(luftr)
 ```{r}
 
 
-home.data.long.5mins <- home.data.long %>% 
-  mutate(Time = as.POSIXct(round(as.double(Time)/(5*60))*(5*60),
+home.data.long.60mins <- home.data.long %>% 
+  mutate(Time = as.POSIXct(round(as.double(Time)/(60*60))*(60*60),
                                   origin=(as.POSIXct('1970-01-01')))) %>% 
   group_by(Time, Variable) %>% 
   mutate(Value = mean(Value, na.rm = T))
 
 home.data.long.day <- home.data.long %>% 
-  mutate(Time = as.Date(Time)) %>% 
-  group_by(Time, Variable) %>% 
+#  filter(-Date) %>% 
+  group_by(Date, Variable) %>% 
   mutate(Value = mean(Value, na.rm = T))
 ```
 
@@ -42,7 +42,7 @@ p
 ```
 
 ```{r}
-p <- home.data.long.5mins %>% 
+p <- home.data.long.60mins %>% 
   filter(Variable %in% c("Time", "SDS_P1", "SDS_P2", "Temp", "Humidity")) %>% 
   ggplot(aes(x = Time, y = Value)) +
   geom_line() +
