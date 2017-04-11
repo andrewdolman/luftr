@@ -41,23 +41,23 @@ dat <-  plyr::ldply(fl.nms, function(x) read_delim(x, delim = ";")) %>%
 
 home.data.new <- dat %>%
   mutate(Time = as.POSIXct(Time),
-         Date = as.Date(Time)) %>%
+         Date = as.Date(Time, ts = "Europe/Berlin")) %>%
   group_by(Time, Date) %>%
   select_if(is.numeric) %>%
   ungroup()
 
-home.data.long.new <- home.data.new %>%
-  gather(Variable, Value, -Time, -Date) %>%
-  filter(complete.cases(Value))
-
-
 ## append new data
 
-home.data <- bind_rows(home.data, home.data.new) %>% 
-  distinct(.)
+home.data <- bind_rows(luftr::home.data, home.data.new) %>%
+  distinct(.) %>%
+  mutate(Date = as.Date(Time, ts = "Europe/Berlin"),
+         PM_10 = SDS_P1,
+         PM_2.5 = SDS_P2)
 
-home.data.long <- bind_rows(home.data.long, home.data.long.new) %>% 
-  distinct(.)
+home.data.long <- home.data %>%
+  select(-SDS_P1, -SDS_P2) %>%
+  gather(Variable, Value, -Time, -Date) %>%
+  filter(complete.cases(Value))
 
 
 devtools::use_data(home.data, home.data.long, overwrite = TRUE)

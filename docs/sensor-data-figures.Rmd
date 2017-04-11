@@ -33,7 +33,7 @@ home.data.long.day <- home.data.long %>%
 
 ```{r}
 p <- home.data.long %>% 
-  filter(Variable %in% c("Time", "SDS_P1", "SDS_P2", "Temp", "Humidity")) %>% 
+  filter(Variable %in% c("Time", "PM_10", "PM_2.5", "Temp", "Humidity")) %>% 
   ggplot(aes(x = Time, y = Value)) +
   geom_line() +
   expand_limits(y = 0) +
@@ -43,7 +43,7 @@ p
 
 ```{r}
 p <- home.data.long.60mins %>% 
-  filter(Variable %in% c("Time", "SDS_P1", "SDS_P2", "Temp", "Humidity")) %>% 
+  filter(Variable %in% c("Time", "PM_10", "PM_2.5", "Temp", "Humidity")) %>% 
   ggplot(aes(x = Time, y = Value)) +
   geom_line() +
   expand_limits(y = 0) +
@@ -54,7 +54,7 @@ p
 
 ```{r}
 p <- home.data.long.day %>% 
-  filter(Variable %in% c("Time", "SDS_P1", "SDS_P2", "Temp", "Humidity")) %>% 
+  filter(Variable %in% c("Time", "PM_10", "PM_2.5", "Temp", "Humidity")) %>% 
   ggplot(aes(x = Time, y = Value)) +
   geom_line() +
   expand_limits(y = 0) +
@@ -62,4 +62,20 @@ p <- home.data.long.day %>%
 p 
 ```
 
-
+```{r}
+p <- home.data.long.day %>% 
+  filter(Variable %in% c("PM_10")) %>% 
+  select(-Time) %>% 
+  ungroup() %>% 
+  distinct() %>% 
+  ggplot(aes(x = Date, y = Value)) +
+  geom_hline(yintercept = 50, colour = "Red")+ 
+  geom_label(x = -Inf, y = 50, label = "EU Limit", hjust = -0.5)+
+  geom_col(alpha = 0.5)+
+  expand_limits(y = 0) +
+#  facet_wrap(~Variable, scales = "free_y")+
+  labs(x = "Date") +
+  scale_y_continuous(expression(Mean~PM[10]~concentration~"[µg"~m^3*"]"))+
+  theme_bw() 
+p 
+```
