@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 ```
 
 ```{r}
@@ -62,7 +62,7 @@ p <- home.data.long.day %>%
 p 
 ```
 
-```{r}
+```{r daily_pm10, fig.width=4.5, fig.height=3.5}
 p <- home.data.long.day %>% 
   filter(Variable %in% c("PM_10")) %>% 
   select(-Time) %>% 
@@ -70,12 +70,13 @@ p <- home.data.long.day %>%
   distinct() %>% 
   ggplot(aes(x = Date, y = Value)) +
   geom_hline(yintercept = 50, colour = "Red")+ 
-  geom_label(x = -Inf, y = 50, label = "EU Limit", hjust = -0.5)+
+  geom_label(x = -Inf, y = 50, label = "EU Limit", hjust = -0.1)+
   geom_col(alpha = 0.5)+
   expand_limits(y = 0) +
 #  facet_wrap(~Variable, scales = "free_y")+
   labs(x = "Date") +
-  scale_y_continuous(expression(Mean~PM[10]~concentration~"[µg"~m^3*"]"))+
+  scale_y_continuous(expression(Mean~PM[10]~concentration~"[µg"~m^3*"]")) +
+  scale_x_date(date_labels = "%d %b") +
   theme_bw() 
 p 
 ```
