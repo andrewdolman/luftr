@@ -62,6 +62,32 @@ p <- home.data.long.day %>%
 p 
 ```
 
+```{r limit_fig}
+PlotDailyLimit <- function(Var){
+  p <- home.data.long.day %>% 
+  filter(Variable %in% c(Var)) %>% 
+  select(-Time) %>% 
+  ungroup() %>% 
+  distinct() %>% 
+  ggplot(aes(x = Date, y = Value)) +
+  geom_hline(yintercept = 50, colour = "Red")+ 
+  geom_col(alpha = 0.5)+
+  geom_label(x = -Inf, y = 50, label = "EU Daily Limit", hjust = -0.1, alpha = 0.05)+
+  expand_limits(y = 0) +
+#  facet_wrap(~Variable, scales = "free_y")+
+  labs(x = "Date") +
+  scale_y_continuous(expression(Mean~PM[10]~concentration~"[µg"~m^3*"]")) +
+  scale_x_date(date_labels = "%d %b") +
+  theme_bw() + 
+  theme(aspect.ratio = 1/sqrt(2), panel.grid = element_blank())
+  
+  return(p)
+}
+
+PlotDailyLimit(Var = "PM_2.5")
+```
+
+
 ```{r daily_pm10, fig.width=4.5, fig.height=3.5}
 p <- home.data.long.day %>% 
   filter(Variable %in% c("PM_10")) %>% 
@@ -70,12 +96,37 @@ p <- home.data.long.day %>%
   distinct() %>% 
   ggplot(aes(x = Date, y = Value)) +
   geom_hline(yintercept = 50, colour = "Red")+ 
-  geom_label(x = -Inf, y = 50, label = "EU Limit", hjust = -0.1)+
   geom_col(alpha = 0.5)+
+  geom_label(x = -Inf, y = 50, label = "EU Daily Limit", hjust = -0.1, alpha = 0.1)+
   expand_limits(y = 0) +
 #  facet_wrap(~Variable, scales = "free_y")+
   labs(x = "Date") +
   scale_y_continuous(expression(Mean~PM[10]~concentration~"[µg"~m^3*"]")) +
+  scale_x_date(date_labels = "%d %b") +
+  theme_bw() + 
+  theme(aspect.ratio = 1/sqrt(2), panel.grid = element_blank())
+p 
+```
+
+
+```{r daily_pm2.5, fig.width=4.5, fig.height=3.5}
+p <- home.data.long.day %>% 
+  filter(Variable %in% c("PM_2.5")) %>% 
+  select(-Time) %>% 
+  ungroup() %>% 
+  distinct() %>% 
+  mutate(Ann.mean.2.5 = mean(Value)) %>% 
+  ggplot(aes(x = Date, y = Value)) +
+  geom_hline(yintercept = 25, colour = "Red")+ 
+  geom_col(alpha = 0.5)+
+  geom_label(x = -Inf, y = 25, label = "EU Annual Limit", hjust = -0.1, alpha = 0.05)+
+  geom_hline(aes(yintercept = unique(Ann.mean.2.5)), colour = "Blue")+ 
+  geom_label(x = -Inf, aes(y = unique(Ann.mean.2.5)), label = "Recorded Mean",
+             hjust = -0.1, alpha = 0.1)+
+  expand_limits(y = 0) +
+#  facet_wrap(~Variable, scales = "free_y")+
+  labs(x = "Date") +
+  scale_y_continuous(expression(Mean~PM[2.5]~concentration~"[µg"~m^3*"]")) +
   scale_x_date(date_labels = "%d %b") +
   theme_bw() + 
   theme(aspect.ratio = 1/sqrt(2), panel.grid = element_blank())
