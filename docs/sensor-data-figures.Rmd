@@ -2,7 +2,9 @@
 title: "Untitled"
 author: "Andrew M. Dolman"
 date: "7 April 2017"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,13 +18,11 @@ library(luftr)
 ```
 
 ```{r}
-
-
 home.data.long.60mins <- home.data.long %>% 
   mutate(Time = as.POSIXct(round(as.double(Time)/(60*60))*(60*60),
                                   origin=(as.POSIXct('1970-01-01')))) %>% 
   group_by(Time, Variable) %>% 
-  mutate(Value = mean(Value, na.rm = T))
+  summarise(Value = mean(Value, na.rm = T)) 
 
 home.data.long.day <- home.data.long %>% 
 #  filter(-Date) %>% 
@@ -62,7 +62,7 @@ p <- home.data.long.day %>%
 p 
 ```
 
-```{r limit_fig}
+```{r limit_fig, echo=FALSE}
 PlotDailyLimit <- function(Var){
   p <- home.data.long.day %>% 
   filter(Variable %in% c(Var)) %>% 
@@ -72,7 +72,7 @@ PlotDailyLimit <- function(Var){
   ggplot(aes(x = Date, y = Value)) +
   geom_hline(yintercept = 50, colour = "Red")+ 
   geom_col(alpha = 0.5)+
-  geom_label(x = -Inf, y = 50, label = "EU Daily Limit", hjust = -0.1, alpha = 0.05)+
+  annotate("label", x = -Inf, y = 50, label = "EU Daily Limit", hjust = -0.1, alpha = 0.05)+
   expand_limits(y = 0) +
 #  facet_wrap(~Variable, scales = "free_y")+
   labs(x = "Date") +
@@ -84,7 +84,7 @@ PlotDailyLimit <- function(Var){
   return(p)
 }
 
-PlotDailyLimit(Var = "PM_2.5")
+#PlotDailyLimit(Var = "PM_2.5")
 ```
 
 
@@ -97,32 +97,38 @@ p <- home.data.long.day %>%
   ggplot(aes(x = Date, y = Value)) +
   geom_hline(yintercept = 50, colour = "Red")+ 
   geom_col(alpha = 0.5)+
-  geom_label(x = -Inf, y = 50, label = "EU Daily Limit", hjust = -0.1, alpha = 0.1)+
+  annotate("label", x = min(home.data.long.day$Date), y = 50, label = "EU Daily Limit",
+          hjust = 0, alpha = 0.5) +
   expand_limits(y = 0) +
-#  facet_wrap(~Variable, scales = "free_y")+
   labs(x = "Date") +
-  scale_y_continuous(expression(Mean~PM[10]~concentration~"[µg"~m^3*"]")) +
+  scale_y_continuous(expression(Mean~PM[10]~concentration~"[ug"~m^3*"]")) +
   scale_x_date(date_labels = "%d %b") +
   theme_bw() + 
   theme(aspect.ratio = 1/sqrt(2), panel.grid = element_blank())
 p 
+
+ggsave("tmp.svg", p)
 ```
 
 
 ```{r daily_pm2.5, fig.width=4.5, fig.height=3.5}
-p <- home.data.long.day %>% 
+dat <- home.data.long.day %>% 
   filter(Variable %in% c("PM_2.5")) %>% 
   select(-Time) %>% 
   ungroup() %>% 
   distinct() %>% 
-  mutate(Ann.mean.2.5 = mean(Value)) %>% 
+  mutate(Ann.mean.2.5 = mean(Value))
+
+p <- dat %>% 
   ggplot(aes(x = Date, y = Value)) +
   geom_hline(yintercept = 25, colour = "Red")+ 
   geom_col(alpha = 0.5)+
-  geom_label(x = -Inf, y = 25, label = "EU Annual Limit", hjust = -0.1, alpha = 0.05)+
+  annotate("label", x = min(dat$Date),
+           y = 25, label = "EU Annual Limit", hjust = 0, alpha = 0.5)+
   geom_hline(aes(yintercept = unique(Ann.mean.2.5)), colour = "Blue")+ 
-  geom_label(x = -Inf, aes(y = unique(Ann.mean.2.5)), label = "Recorded Mean",
-             hjust = -0.1, alpha = 0.1)+
+  annotate("label", x = max(dat$Date),
+           y = unique(dat$Ann.mean.2.5), label = "Recorded Mean",
+             hjust = 1, alpha = 0.5)+
   expand_limits(y = 0) +
 #  facet_wrap(~Variable, scales = "free_y")+
   labs(x = "Date") +
@@ -132,3 +138,21 @@ p <- home.data.long.day %>%
   theme(aspect.ratio = 1/sqrt(2), panel.grid = element_blank())
 p 
 ```
+
+
+```{r, echo=FALSE}
+# home.data.wide.60mins <- home.data.long.60mins %>% 
+#   spread(Variable, Value) %>% 
+#   mutate(PM2.5_PM10 = PM_2.5 / PM_10 )
+# 
+# home.data.wide.60mins %>%
+#   ggplot(aes(x = PM_10, y = PM_2.5)) +
+#   geom_point() +
+#   geom_abline(intercept = 0, slope = 1)
+
+# home.data.wide.60mins %>% 
+#   ggplot(aes(x = PM2.5_PM10)) +
+#   geom_histogram()
+
+```
+
