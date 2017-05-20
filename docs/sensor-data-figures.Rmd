@@ -99,7 +99,6 @@ p <- home.data.long.day %>%
   geom_col(alpha = 1, fill = "Grey")+
   annotate("label", x = min(home.data.long.day$Date), y = 50, label = "EU Daily Limit",
           hjust = 0, alpha = 0.5) +
-  expand_limits(y = 0) +
   labs(x = "Date") +
   scale_y_continuous(expression(Mean~PM[10]~concentration~"[ug"~m^3*"]")) +
   scale_x_date(date_labels = "%d %b") +
@@ -129,8 +128,6 @@ p <- dat %>%
   annotate("label", x = max(dat$Date),
            y = unique(dat$Ann.mean.2.5), label = "Recorded Mean",
              hjust = 1, alpha = 0.5)+
-  expand_limits(y = 0) +
-#  facet_wrap(~Variable, scales = "free_y")+
   labs(x = "Date") +
   scale_y_continuous(expression(Mean~PM[2.5]~concentration~"[µg"~m^3*"]")) +
   scale_x_date(date_labels = "%d %b") +
