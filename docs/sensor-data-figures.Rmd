@@ -3,8 +3,8 @@ title: "Untitled"
 author: "Andrew M. Dolman"
 date: "7 April 2017"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -96,7 +96,7 @@ p <- home.data.long.day %>%
   distinct() %>% 
   ggplot(aes(x = Date, y = Value)) +
   geom_hline(yintercept = 50, colour = "Red")+ 
-  geom_col(alpha = 0.5)+
+  geom_col(alpha = 1, fill = "Grey")+
   annotate("label", x = min(home.data.long.day$Date), y = 50, label = "EU Daily Limit",
           hjust = 0, alpha = 0.5) +
   expand_limits(y = 0) +
@@ -107,7 +107,7 @@ p <- home.data.long.day %>%
   theme(aspect.ratio = 1/sqrt(2), panel.grid = element_blank())
 p 
 
-ggsave("tmp.svg", p)
+#ggsave("tmp.svg", p)
 ```
 
 
@@ -122,10 +122,10 @@ dat <- home.data.long.day %>%
 p <- dat %>% 
   ggplot(aes(x = Date, y = Value)) +
   geom_hline(yintercept = 25, colour = "Red")+ 
-  geom_col(alpha = 0.5)+
+  geom_hline(aes(yintercept = unique(Ann.mean.2.5)), colour = "Blue")+ 
+  geom_col(alpha = 1, fill = "Grey")+
   annotate("label", x = min(dat$Date),
            y = 25, label = "EU Annual Limit", hjust = 0, alpha = 0.5)+
-  geom_hline(aes(yintercept = unique(Ann.mean.2.5)), colour = "Blue")+ 
   annotate("label", x = max(dat$Date),
            y = unique(dat$Ann.mean.2.5), label = "Recorded Mean",
              hjust = 1, alpha = 0.5)+
