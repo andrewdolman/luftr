@@ -3,8 +3,8 @@ title: "Untitled"
 author: "Andrew M. Dolman"
 date: "7 April 2017"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -21,7 +21,7 @@ library(luftr)
 home.data.long.60mins <- home.data.long %>% 
   mutate(Time = as.POSIXct(round(as.double(Time)/(60*60))*(60*60),
                                   origin=(as.POSIXct('1970-01-01')))) %>% 
-  group_by(Time, Variable) %>% 
+  group_by(Time, Date, Variable) %>% 
   summarise(Value = mean(Value, na.rm = T)) 
 
 home.data.long.day <- home.data.long %>% 
@@ -32,13 +32,13 @@ home.data.long.day <- home.data.long %>%
 
 
 ```{r}
-p <- home.data.long %>% 
-  filter(Variable %in% c("Time", "PM_10", "PM_2.5", "Temp", "Humidity")) %>% 
-  ggplot(aes(x = Time, y = Value)) +
-  geom_line() +
-  expand_limits(y = 0) +
-  facet_wrap(~Variable, scales = "free_y")
-p  
+# p <- home.data.long %>% 
+#   filter(Variable %in% c("Time", "PM_10", "PM_2.5", "Temp", "Humidity")) %>% 
+#   ggplot(aes(x = Time, y = Value)) +
+#   geom_line() +
+#   expand_limits(y = 0) +
+#   facet_wrap(~Variable, scales = "free_y")
+# p  
 ```
 
 ```{r}
@@ -97,8 +97,8 @@ p <- home.data.long.day %>%
   ggplot(aes(x = Date, y = Value)) +
   geom_hline(yintercept = 50, colour = "Red")+ 
   geom_col(alpha = 1, fill = "Grey")+
-  annotate("label", x = min(home.data.long.day$Date), y = 50, label = "EU Daily Limit",
-          hjust = 0, alpha = 0.5) +
+  annotate("label", x = mean(home.data.long.day$Date), y = 50, label = "EU Daily Limit",
+          hjust = 0, alpha = 0.75) +
   labs(x = "Date") +
   scale_y_continuous(expression(Mean~PM[10]~concentration~"[ug"~m^3*"]")) +
   scale_x_date(date_labels = "%d %b") +
@@ -124,10 +124,10 @@ p <- dat %>%
   geom_hline(aes(yintercept = unique(Ann.mean.2.5)), colour = "Blue")+ 
   geom_col(alpha = 1, fill = "Grey")+
   annotate("label", x = min(dat$Date),
-           y = 25, label = "EU Annual Limit", hjust = 0, alpha = 0.5)+
+           y = 25, label = "EU Annual Limit", hjust = 0, alpha = 0.75)+
   annotate("label", x = max(dat$Date),
            y = unique(dat$Ann.mean.2.5), label = "Recorded Mean",
-             hjust = 1, alpha = 0.5)+
+             hjust = 1, alpha = 0.75)+
   labs(x = "Date") +
   scale_y_continuous(expression(Mean~PM[2.5]~concentration~"[µg"~m^3*"]")) +
   scale_x_date(date_labels = "%d %b") +
@@ -151,5 +151,19 @@ p
 #   ggplot(aes(x = PM2.5_PM10)) +
 #   geom_histogram()
 
+```
+
+
+```{r}
+ # p <- home.data.long.60mins %>%
+ #   mutate(Hour = hour(Time)) %>%
+ #   group_by(Hour, Variable) %>%
+ #   summarise(Value = median(Value)) %>%
+ #   filter(Variable %in% c("Time", "PM_10", "PM_2.5", "Temp", "Humidity")) %>%
+ #   ggplot(aes(x = Hour, y = Value)) +
+ #   geom_line() +
+ #   expand_limits(y = 0, x = 24) +
+ #   facet_wrap(~Variable, scales = "free_y")
+ # p
 ```
 
