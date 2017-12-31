@@ -52,7 +52,7 @@ home.data <- bind_rows(luftr::home.data, home.data.new) %>%
 
 # Get latest date of existing data
 
-latest.date <- as.Date(max(home.data.mothly.zip$Date))
+latest.date <- as.Date(max(luftr::home.data$Date))
 
 
 # fl.nms <-
