@@ -91,7 +91,7 @@ home.data.new <- dat %>%
 
 ## append new data
 
-home.data <- bind_rows(home.data.mothly.zip, home.data.new) %>%
+home.data <- bind_rows(luftr::home.data, home.data.new) %>%
   distinct(.) %>%
   mutate(Date = as.Date(Time, ts = "Europe/Berlin"),
          PM_10 = SDS_P1,
