@@ -1,4 +1,5 @@
 # Load packages
+library(luftr)
 library(tidyverse)
 library(lubridate)
 
@@ -19,7 +20,7 @@ latest.date <- lubridate::today()-1
 # reverse order to try until failure at earliest date -1
 dates <- rev(seq(earliest.date, latest.date, by='days'))
 
-plyr::l_ply(dates, function(x) GetLuftdata(id = "sds011_sensor_2057", date = x))
+plyr::l_ply(dates, function(x) GetLuftdata(id = "sds011_sensor_1444", date = x))
 
 
 
@@ -81,6 +82,11 @@ multi.data.hourly.wide %>%
   geom_point(alpha = 0.15) +
   geom_abline(intercept = 0, slope = 1)
 
+
+multi.data %>%
+  filter(sensor_id == "1444") %>%
+  ggplot(aes(x = Time, y = PM_10)) +
+  geom_line()
 
 
 

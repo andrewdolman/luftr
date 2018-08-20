@@ -4,12 +4,19 @@ library(lubridate)
 library(XML)
 
 ## Download monthly zip files
+#https://www.madavi.de/sensor/data_csv/2018/06/data-esp8266-1190180-
+url.1 <- "https://www.madavi.de/sensor/data_csv/"
+url.2 <- "/data-esp8266-1190180-"
 
-url <- "https://www.madavi.de/sensor/data/2017/data-esp8266-1190180-"
-dts <- c(paste0("2017-0", 4:9), paste0("2017-", 10:11))
+dts.1 <- c(paste0("2018/0", 1:6))
+dts.2 <- c(paste0("2018-0", 1:6))
 
-urls <- paste0(url, dts, ".zip")
-fl.nms <- paste0("data-raw/zip/esp8266-1190180", dts, ".zip")
+# dts.1 <- c(paste0("2017/12"))
+# dts.2 <- c(paste0("2017-12"))
+
+
+urls <- paste0(url.1, dts.1, url.2, dts.2, ".zip")
+fl.nms <- paste0("data-raw/zip/esp8266-1190180", dts.2, ".zip")
 #fl.nms <- paste0("data-raw/raw-files/esp8266-11901802017-05-13.csv")
 if (dir.exists("data-raw/zip")==FALSE){
   dir.create("data-raw/zip")
@@ -39,11 +46,13 @@ home.data.mothly.zip <- dat %>%
   select_if(is.numeric) %>%
   ungroup()
 
-home.data <- bind_rows(luftr::home.data, home.data.new) %>%
+home.data <- bind_rows(luftr::home.data, home.data.mothly.zip) %>%
   distinct(.) %>%
   mutate(Date = as.Date(Time, ts = "Europe/Berlin"),
          PM_10 = SDS_P1,
-         PM_2.5 = SDS_P2)
+         PM_2.5 = SDS_P2,
+         Temp = ifelse(is.na(Temp), BMP_temperature, Temp),
+         Humidity = ifelse(is.na(Humidity), BME280_humidity, Humidity))
 
 
 
@@ -52,7 +61,7 @@ home.data <- bind_rows(luftr::home.data, home.data.new) %>%
 
 # Get latest date of existing data
 
-latest.date <- as.Date(max(luftr::home.data$Date))
+latest.date <- as.Date(max(home.data$Date))
 
 
 # fl.nms <-
@@ -61,9 +70,8 @@ latest.date <- as.Date(max(luftr::home.data$Date))
 # url <- "https://www.madavi.de/sensor/csvfiles.php?sensor=esp8266-1190180/"
 # doc <- XML::htmlParse(url)
 # links <- XML::xpathSApply(doc, "//a/@href")
-
-url <- "https://www.madavi.de/sensor/data/data-esp8266-1190180-"
-dts <- seq(latest.date+1, lubridate::today(), by='days')
+url <- "https://www.madavi.de/sensor/data_csv/data-esp8266-1190180-"
+dts <- seq(latest.date+2, lubridate::today(), by='days')
 
 urls <- paste0(url, dts, ".csv")
 fl.nms <- paste0("data-raw/raw-files/esp8266-1190180", dts, ".csv")
@@ -91,7 +99,7 @@ home.data.new <- dat %>%
 
 ## append new data
 
-home.data <- bind_rows(luftr::home.data, home.data.new) %>%
+home.data <- bind_rows(home.data, home.data.new) %>%
   distinct(.) %>%
   mutate(Date = as.Date(Time, ts = "Europe/Berlin"),
          PM_10 = SDS_P1,
